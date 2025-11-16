@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Simple Weather App</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--accent:#60a5fa;--muted:#94a3b8}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:linear-gradient(180deg,#071026 0%,#0f1724 100%);color:#e6eef8;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:16px;padding:20px;width:100%;max-width:520px;box-shadow:0 8px 30px rgba(2,6,23,0.6)}
+    h1{margin:0 0 12px;font-size:20px}
+    form{display:flex;gap:8px}
+    input[type="text"]{flex:1;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit;font-size:15px}
+    button{padding:10px 14px;border-radius:10px;border:none;background:var(--accent);color:#042042;font-weight:600;cursor:pointer}
+    .result{margin-top:16px;display:none;gap:12px;align-items:center}
+    .meta{font-size:13px;color:var(--muted)}
+    .temp{font-size:44px;font-weight:700}
+    .condition{display:flex;align-items:center;gap:10px}
+    .icon{width:64px;height:64px}
+    .loader{border:4px solid rgba(255,255,255,0.06);border-top:4px solid var(--accent);border-radius:50%;width:36px;height:36px;animation:spin 1s linear infinite;display:none;margin-left:8px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .error{margin-top:12px;color:#ffb4b4;background:rgba(255,80,80,0.07);padding:10px;border-radius:8px;display:none}
+    footer{margin-top:14px;font-size:12px;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+    a.attrib{color:var(--accent);text-decoration:none;font-weight:600}
+    @media (max-width:420px){.temp{font-size:36px}.icon{width:48px;height:48px}}
+  </style>
+</head>
+<body>
+  <main class="card" role="main">
+    <h1>Simple Weather App</h1>
+    <p class="meta">Enter a city name (or city, country) and press <strong>Search</strong>.</p>
+
+    <form id="searchForm" autocomplete="off">
+      <input id="query" type="text" placeholder="e.g. London, New Delhi or 10001" required />
+      <button id="searchBtn" type="submit">Search</button>
+      <div class="loader" id="loader" aria-hidden="true"></div>
+    </form>
+
+    <div class="error" id="error" role="alert"></div>
+
+    <div class="result" id="result">
+      <div class="condition">
+        <img src="" alt="weather icon" class="icon" id="icon">
+        <div>
+          <div class="temp" id="temp"></div>
+          <div class="meta" id="location"></div>
+          <div class="meta" id="localTime"></div>
+        </div>
+      </div>
+
+      <div style="margin-top:10px;display:flex;gap:12px;flex-wrap:wrap">
+        <div class="meta">Feels like: <strong id="feelslike"></strong></div>
+        <div class="meta">Wind: <strong id="wind"></strong></div>
+        <div class="meta">Humidity: <strong id="humidity"></strong></div>
+        <div class="meta">AQI (US): <strong id="aqi"></strong></div>
+      </div>
+    </div>
+
+    <footer>
+      <div>Made with <span style="color:var(--accent)">WeatherAPI.com</span></div>
+      <a class="attrib" href="https://www.weatherapi.com/" target="_blank" rel="noopener">Powered by WeatherAPI</a>
+    </footer>
+  </main>
+
+  <script>
+    const API_KEY = 'feb8ad759d30487b869175017251611';
+    const BASE = 'http://api.weatherapi.com/v1/current.json';
+
+    const form = document.getElementById('searchForm');
+    const qInput = document.getElementById('query');
+    const searchBtn = document.getElementById('searchBtn');
+    const loader = document.getElementById('loader');
+    const errorBox = document.getElementById('error');
+    const result = document.getElementById('result');
+    const iconEl = document.getElementById('icon');
+    const tempEl = document.getElementById('temp');
+    const locationEl = document.getElementById('location');
+    const localTimeEl = document.getElementById('localTime');
+    const feelsEl = document.getElementById('feelslike');
+    const windEl = document.getElementById('wind');
+    const humidityEl = document.getElementById('humidity');
+    const aqiEl = document.getElementById('aqi');
+
+    function showLoading(on){loader.style.display = on ? 'inline-block' : 'none'; searchBtn.disabled = on;}
+    function showError(msg){errorBox.textContent = msg; errorBox.style.display = msg ? 'block' : 'none';}
+
+    async function fetchWeather(query){
+      const url = `${BASE}?key=${API_KEY}&q=${encodeURIComponent(query)}&aqi=yes`;
+      try{
+        showError('');
+        showLoading(true);
+        const res = await fetch(url);
+        if(!res.ok){
+          const text = await res.text();
+          throw new Error(res.status + ' ' + (text || res.statusText));
+        }
+        const data = await res.json();
+        return data;
+      }finally{
+        showLoading(false);
+      }
+    }
+
+    function render(data){
+      if(!data) return;
+      const c = data.current;
+      const loc = data.location;
+      iconEl.src = c.condition.icon.startsWith('//') ? 'https:' + c.condition.icon : c.condition.icon;
+      iconEl.alt = c.condition.text || 'weather';
+      tempEl.textContent = `${c.temp_c}°C / ${c.temp_f}°F - ${c.condition.text}`;
+      locationEl.textContent = `${loc.name}, ${loc.region ? loc.region + ', ' : ''}${loc.country}`;
+      localTimeEl.textContent = `Local Time: ${loc.localtime}`;
+      feelsEl.textContent = `${c.feelslike_c}°C`;
+      windEl.textContent = `${c.wind_kph} kph ${c.wind_dir}`;
+      humidityEl.textContent = c.humidity + '%';
+      aqiEl.textContent = (c.air_quality && c.air_quality['us-epa-index']) ? c.air_quality['us-epa-index'] : 'N/A';
+      result.style.display = 'flex';
+    }
+
+    form.addEventListener('submit', async function(e){
+      e.preventDefault();
+      const q = qInput.value.trim();
+      if(!q) return showError('Please enter a location.');
+      try{
+        const data = await fetchWeather(q);
+        if(data && data.error){
+          showError(data.error.message || 'Unknown error');
+          result.style.display = 'none';
+        } else {
+          render(data);
+        }
+      }catch(err){
+        console.error(err);
+        showError('Could not fetch weather — check the location or your API key.');
+        result.style.display = 'none';
+      }
+    });
+
+    qInput.value = 'London';
+  </script>
+</body>
+</html>
