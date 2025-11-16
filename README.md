@@ -1,2 +1,26 @@
-# simple-weather-app
-A simple and modern Weather App built using HTML, CSS, and JavaScript. It fetches real-time weather data like temperature, humidity, wind, AQI, and local time using WeatherAPI.com. Users can enter any city name and instantly see the live weather details in a clean UI.
+
+# 🌤️ Simple Weather App
+
+A clean and modern weather application built with **HTML, CSS, and JavaScript**.  
+Fetches real-time weather data using **WeatherAPI.com**.
+
+## 🚀 Features
+
+- Search weather by city name
+- Shows:
+  - Temperature (°C/°F)
+  - Weather condition & icon
+  - Local time
+  - Wind speed & direction
+  - Humidity
+  - AQI (US EPA Index)
+- Smooth UI with loading indicator
+- Fully responsive design
+
+## 🛠️ Technologies Used
+
+- **HTML5**
+- **CSS3**
+- **Vanilla JavaScript**
+- **WeatherAPI.com**
+
