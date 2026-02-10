@@ -33,3 +33,9 @@ It sends alerts for rain, storms, and extreme weather.
 It helps plan travel, outdoor activities, and clothing.
 
 It gives location-based weather and air quality info.
+
+It sends alerts for rain, storms, and extreme weather.
+
+It helps plan travel, outdoor activities, and clothing.
+
+It gives location-based weather and air quality info.
