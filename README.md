@@ -24,3 +24,12 @@ Fetches real-time weather data using **WeatherAPI.com**.
 - **Vanilla JavaScript**
 - **WeatherAPI.com**
 
+A weather app shows current temperature and weather conditions.
+
+It provides daily and weekly weather forecasts.
+
+It sends alerts for rain, storms, and extreme weather.
+
+It helps plan travel, outdoor activities, and clothing.
+
+It gives location-based weather and air quality info.
